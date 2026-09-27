@@ -1,8 +1,11 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { registerRoutes } from './routes.js';
+import { sweepLostStations } from './store.js';
 const app = Fastify({ logger: true });
 await app.register(cors, { origin: true });
 await registerRoutes(app);
+const sweepTimer = setInterval(() => sweepLostStations(), Number(process.env.SWEEP_INTERVAL_MS ?? 15_000));
+sweepTimer.unref();
 const port = Number(process.env.PORT ?? 4301);
 await app.listen({ port, host: '0.0.0.0' });
